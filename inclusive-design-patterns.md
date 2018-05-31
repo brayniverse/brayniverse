@@ -1,4 +1,3 @@
-[Brayniverse <span class="sr-only">Home</span>](/)
 # A Review of Inclusive Design Patterns
 
 ![Inclusive design patterns book cover](/inclusive-design-patterns-book-cover.png)
