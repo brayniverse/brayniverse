@@ -47,60 +47,54 @@ The email address allows us to determine whether the guest has misspelt their em
 ## `ip_address`
 
 We should not assume that an intruder will consecutively target the same email address. Therefore, we also record the IP address as well to identify when the same source is attempting several addresses.
-<pre>
-    <code>
-        class FailedLoginAttempt extends Model<br />
-        {<br />
-        &#9;protected $fillable = [<br />
-        &#9;&#9;'user_id', 'email', 'ip_address',<br />
-        &#9;];<br />
-        <br />
-        &#9;public static function record($user = null, $email, $ip)<br />
-        &#9;{<br />
-        &#9;&#9;return static::create([<br />
-        &#9;&#9;&#9;'user_id' =&gt; is_null($user) ? null : $user-&gt;id,<br />
-        &#9;&#9;&#9;'email_address' =&gt; $email,<br />
-        &#9;&#9;&#9;'ip_address' =&gt; $ip<br />
-        &#9;&#9;]);<br />
-        &#9;}<br />
-        }
-    </code>
-</pre>
+
+```php
+class FailedLoginAttempt extends Modal
+{
+    protected $fillable = [
+        'user_id', 'email_address', 'ip_address',
+    ];
+    
+    public static function record($user = null, $email, $ip)
+    {
+        return static::create([
+            'user_id' => is_null($user) ? null : $user->id,
+            'email_address' => $email,
+            'ip_address' => $ip,
+        ]);
+    }
+}
+```
 
 Now create a `RecordFailedLoginAttempt` event listener and register it in the `EventServiceProvider`.
 
 ```php artisan make:listener RecordFailedLoginAttempt --event=Illuminate\\Auth\\Events\\Failed```
 
-<pre>
-    <code>
-        class RecordFailedLoginAttempt<br />
-        {<br />
-        &#9;public function handle(Failed $event)<br />
-        &#9;{<br />
-        &#9;&#9;FailedLoginAttempt::record(<br />
-        &#9;&#9;&#9;$event-&gt;user,<br />
-        &#9;&#9;&#9;$event-&gt;credentails['email'],<br />
-        &#9;&#9;&#9;request()-&gt;ip()<br />
-        &#9;&#9;);<br />
-        &#9;}<br />
-        }
-    </code>
-</pre>
-<pre>
-    <code>
-        class EventServiceProvider extends ServiceProvider<br />
-        {<br />
-        &#9;...<br />
-        &#9;protected $listen = [<br />
-        &#9;&#9;\\Illuminate\\Auth\\Events\\Failed::class =&gt; [<br />
-        &#9;&#9;&#9;\\App\\Listeners\\RecordFailedLoginAttempt::class,<br />
-        &#9;&#9;]<br />
-        &#9;];<br />
-        <br />
-        &#9;...<br />
-        }
-    </code>
-</pre>
+```php
+class RecordFailedLoginAttempt
+{
+    public function handle(Failed $event)
+    {
+        FailedLoginAttempt::record(
+            $event->user,
+            $event->credentials['email'],
+            request()->ip()
+        );
+    }
+}
+```
+
+```php
+class EventServiceProvider extends ServiceProvider
+{
+    ...
+    protected $listen = [
+        \Illuminate\Auth\Events\Failed::class => [
+            \App\Listeners\RecordFailedLoginAttempt::class,
+        ],
+    ];
+}
+```
 
 Finally, to test that the feature is working.
 
