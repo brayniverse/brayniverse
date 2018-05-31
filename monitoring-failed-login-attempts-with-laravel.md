@@ -93,45 +93,43 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\RecordFailedLoginAttempt::class,
         ],
     ];
+    ...
 }
 ```
 
 Finally, to test that the feature is working.
 
-<pre>
-    <code>
-        class FailedLoginTest extends TestCase<br />
-        {<br />
-        &#9;use DatabaseTransactions;<br />
-        &#9;/** @test */<br />
-        &#9;public function failed_login_attempts_are_recorded()<br />
-        &#9;{<br />
-        &#9;&#9;$this-&gt;visit('/login')<br />
-        &#9;&#9;&#9;-&gt;type('john@doe.com', 'email')<br />
-        &#9;&#9;&#9;-&gt;type('incorrect password', 'password')<br />
-        &#9;&#9;&#9;-&gt;press('Log In');<br />
-        <br />
-        &#9;&#9;$this-&gt;seeInDatabase('failed_login_attempts', [<br />
-        &#9;&#9;&#9;'user_id' =&gt; null,<br />
-        &#9;&#9;&#9;'email_address' =&gt; 'john@doe.com',<br />
-        &#9;&#9;]);<br />
-        &#9;}<br />
-        <br />
-        &#9;/** @test */<br />
-        &#9;public function existing_user_is_recorded()<br />
-        &#9;{<br />
-        &#9;&#9;$user = factory(User::class)-&gt;create();<br />
-        <br />
-        &#9;&#9;$this-&gt;visit('/login')<br />
-        &#9;&#9;&#9;-&gt;type($user-&gt;email, 'email')<br />
-        &#9;&#9;&#9;-&gt;type('incorrect password', 'password')<br />
-        &#9;&#9;&#9;-&gt;press('Log In');<br />
-        <br />
-        &#9;&#9;$this-&gt;seeInDatabase('failed_login_attempts', [<br />
-        &#9;&#9;&#9;'user_id' =&gt; $user-&gt;id,<br />
-        &#9;&#9;&#9;'email_address' =&gt; $user-&gt;email,<br />
-        &#9;&#9;]);<br />
-        &#9;}<br />
-        }
-    </code>
-</pre>
+```php
+class FailedLoginTest extends TestCase
+{
+    use DatabaseTransactions;
+    
+    public function test_failed_login_attempts_are_recorded()
+    {
+        $this->visit('/login')
+            ->type('john@doe.com', 'email')
+            ->type('incorrect password', 'password')
+            ->press('Log In');
+            
+        $this->seeInDatabase('failed_login_attempts', [
+            'user_id' => null,
+            'email_address' => 'john@doe.com'
+       ]);
+    }
+    
+    public function test_existing_user_is_recorded()
+    {
+        $user = factory(User::class)->create();
+        
+        $this->visit('/login')
+            ->type($user->email, 'email')
+            ->type('incorrect password', 'password')
+            ->press('Log In');
+            
+        $this->seeInDatabase('failed_login_attempts', [
+            'user_id' => $user->id,
+            'email_address' => $user->email,
+        ]);
+    }
+}
+```
