@@ -24,25 +24,29 @@ To begin with let's make a new <code>LoginAttempt</code> model and a migration f
 
 In the migration file add the following.
 
-<pre>
-    <code>
-        Schema::create('failed_login_attempts', function (Blueprint $table) {<br />
-        &#9;$table-&gt;increments('id');<br />
-        &#9;$table-&gt;unsignedInteger('user_id')-&gt;nullable();<br />
-        &#9;$table-&gt;string('email_address');<br />
-        &#9;$table-&gt;ipAddress('ip_address');<br />
-        &#9;$table-&gt;timestamps();<br />
-        <br />
-        &#9;$table-&gt;foreign('user_id')-&gt;references('id')-&gt;on('users');<br />
-        });
-    </code>
-</pre>
-<h2 id="user_id"><code>user_id</code></h2>
-<p>The user's ID helps us to identify an attack on a particular account.</p>
-<h2 id="email_address"><code>email_address</code></h2>
-<p>The email address allows us to determine whether the guest has misspelt their email, which could explain the failed login attempts.</p>
-<h2 id="ip_address"><code>ip_address</code></h2>
-<p>We should not assume that an intruder will consecutively target the same email address. Therefore, we also record the IP address as well to identify when the same source is attempting several addresses.</p>
+```php
+Schema::create('failed_login_attempts', function (Blueprint $table) {
+    $table->incremenets('id');
+    $table->unsignedInteger('user_id')->nullable();
+    $table->string('email_address');
+    $table->ipAddress('ip_address');
+    $table->timestamps();
+    
+    $table->foreign('user_id')->references('id')->on('users');
+});
+```
+
+## `user_id`
+
+The user's ID helps us to identify an attack on a particular account.
+
+## `email_address`
+
+The email address allows us to determine whether the guest has misspelt their email, which could explain the failed login attempts.
+
+## `ip_address`
+
+We should not assume that an intruder will consecutively target the same email address. Therefore, we also record the IP address as well to identify when the same source is attempting several addresses.
 <pre>
     <code>
         class FailedLoginAttempt extends Model<br />
@@ -62,12 +66,11 @@ In the migration file add the following.
         }
     </code>
 </pre>
-<p>Now create a <code>RecordFailedLoginAttempt</code> event listener and register it in the <code>EventServiceProvider</code>.</p>
-<pre>
-    <code>
-        php artisan make:listener RecordFailedLoginAttempt --event=Illuminate\\Auth\\Events\\Failed
-    </code>
-</pre>
+
+Now create a `RecordFailedLoginAttempt` event listener and register it in the `EventServiceProvider`.
+
+```php artisan make:listener RecordFailedLoginAttempt --event=Illuminate\\Auth\\Events\\Failed```
+
 <pre>
     <code>
         class RecordFailedLoginAttempt<br />
@@ -98,7 +101,9 @@ In the migration file add the following.
         }
     </code>
 </pre>
-<p>Finally, to test that the feature is working.</p>
+
+Finally, to test that the feature is working.
+
 <pre>
     <code>
         class FailedLoginTest extends TestCase<br />
