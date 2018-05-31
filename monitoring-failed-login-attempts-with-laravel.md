@@ -1,4 +1,3 @@
-[Brayniverse <span class="sr-only">Home</span>](/)
 # Monitoring Failed Login Attempts With Laravel
 
 Published on <time datetime="2017-01-18">08 January, 2017</time>
