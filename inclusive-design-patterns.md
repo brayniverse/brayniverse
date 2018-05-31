@@ -1,8 +1,7 @@
 [Brayniverse <span class="sr-only">Home</span>](/)
 # A Review of Inclusive Design Patterns
-<center>
-    ![Inclusive design patterns book cover](/inclusive-design-patterns-book-cover.png)
-</center>
+
+![Inclusive design patterns book cover](/inclusive-design-patterns-book-cover.png)
 
 I <i>just</i> finished reading <a href="https://shop.smashingmagazine.com/products/inclusive-design-patterns" target="_blank">Inclusive Design Patterns by Haydon Pickering</a> and want to take a minute to recommend it to whomever is interested.
 
